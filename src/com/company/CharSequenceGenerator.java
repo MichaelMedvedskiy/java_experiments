@@ -1,33 +1,52 @@
 package com.company;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 public class CharSequenceGenerator {
 
-    static LinkedList<Character> prevMet = new LinkedList<Character>();
+    private LinkedList<Character> allowed = new LinkedList<>();
+    private LinkedList<Character> met = new LinkedList<>();
+    private final String abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase();
+    private final Random rnd = new Random();
+    private final int nonRepeatDist = 5;
 
-    public static void main(String[] args) {
-        int intervalToHaveNoRepeatingCharactersIn = 5;
-        for (int i = 0; i < intervalToHaveNoRepeatingCharactersIn; i++) {
-            prevMet.add(' ');
+
+    public void generateList() {
+        for(int i = 0; i < abc.length(); i++) {
+            char c = abc.charAt(i);
+            allowed.add(c);
         }
+        boolean justPrintedSpace = true;
         for (int i =0; i < 750; i++ ) {
-            System.out.print(rndChar());
+
+            if(rnd.nextInt(8) == 0 && !justPrintedSpace) {
+                if(rnd.nextInt(8) == 0) {
+                    System.out.print('\n');
+                }
+                else {
+                    System.out.print(' ');
+                }
+                justPrintedSpace = true;
+            }
+            else {
+                justPrintedSpace = false;
+                System.out.print(rndChar());
+            }
         }
     }
 
-    private static char rndChar () {
-        String abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ        \n".toLowerCase();
-        char generated= ';';
-        do {
-            generated = abc.charAt(new Random().nextInt(abc.length()));
+    private char rndChar () {
+        int idxOfRandChar = rnd.nextInt(allowed.size());
+        char generatedChar = allowed.remove(idxOfRandChar);
+        met.add(generatedChar);
+        if(met.size() >= nonRepeatDist) {
+            char newlyAvailableChar = met.removeFirst();
+            allowed.add(newlyAvailableChar);
         }
-        while (new HashSet<Character>(prevMet).contains(generated));
-        prevMet.removeFirst();
-        prevMet.add(generated);
-        return generated;
+        return generatedChar;
+    }
+
+    public static void main(String[] args) {
+        new CharSequenceGenerator().generateList();
     }
 }
